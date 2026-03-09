@@ -1,42 +1,47 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import sequelize from './config/database.js';
+import authRoutes from './routes/authRoutes.js';
 
-import app from './src/app';
-import { sequelize } from './src/config/database';
-import { configDotenv } from 'dotenv';
+dotenv.config();
+
+const app = express();
+
+// Мидлвары
+app.use(cors({
+  origin: 'http://localhost:5173', // или ваш порт фронтенда
+  credentials: true
+}));
+app.use(express.json());
+
+// Роуты
+app.use('/api/auth', authRoutes);
+
+// Проверка сервера
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date() });
+});
 
 const PORT = process.env.PORT || 3000;
 
-async function startServer() {
+const startServer = async () => {
   try {
-    // Проверка подключения к БД
-    await sequelize.authenticate();
-    console.log('✓ Database connected successfully');
+    // Включаем WAL режим для SQLite
+    await sequelize.query('PRAGMA journal_mode=WAL');
+    
+    // Синхронизируем модели с БД
+    await sequelize.sync({ alter: true });
+    console.log('✅ База данных готова');
 
-    // Синхронизация моделей (только для разработки!)
-    if (process.env.NODE_ENV === 'development') {
-      await sequelize.sync({ alter: true });
-      console.log('✓ Models synchronized');
-    }
-
-    // Запуск сервера
-    const server = app.listen(PORT, () => {
-      console.log(`✓ Auth server running on port ${PORT}`);
-      console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`✓ Security features enabled`);
+    app.listen(PORT, () => {
+      console.log(`✅ Сервер запущен на порту ${PORT}`);
+      console.log(`📍 Локальный адрес: http://localhost:${PORT}`);
     });
-
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-      console.log('SIGTERM received, shutting down gracefully');
-      server.close(() => {
-        sequelize.close();
-        console.log('Server closed');
-      });
-    });
-
   } catch (error) {
-    console.error('✗ Failed to start server:', error);
+    console.error('❌ Ошибка запуска сервера:', error);
     process.exit(1);
   }
-}
+};
 
 startServer();

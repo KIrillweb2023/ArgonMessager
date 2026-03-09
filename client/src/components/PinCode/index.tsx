@@ -1,24 +1,41 @@
 import { useRef, useState, useEffect, type ChangeEvent, type KeyboardEvent, type ClipboardEvent } from 'react';
 
-export const PinInput: React.FC = () => {
+interface PinInputProps {
+  onChange?: (code: string) => void;
+  onComplete?: (code: string) => void;
+  disabled?: boolean;
+}
+
+export const PinInput: React.FC<PinInputProps> = ({ onChange, onComplete, disabled = false }) => {
   const [values, setValues] = useState<string[]>(['', '', '', '', '', '']);
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Фокус на первое поле при монтировании
   useEffect(() => {
-    inputs.current[0]?.focus();
-  }, []);
+    if (!disabled && inputs.current[0]) {
+      inputs.current[0].focus();
+    }
+  }, [disabled]);
+
+  useEffect(() => {
+    const code: string = values.join('');
+    onChange?.(code);
+    
+    if (code.length === 6 && !values.includes('')) {
+      onComplete?.(code);
+    }
+  }, [values, onChange, onComplete]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, index: number): void => {
-    const input = e.target;
-    let newValue = input.value;
+    if (disabled) return;
     
-    // Если вставили больше одного символа (например через автозаполнение)
+    const input = e.target;
+    const newValue: string = input.value;
+    
     if (newValue.length > 1) {
-      const digits = newValue.replace(/\D/g, '').split('').slice(0, 6);
-      const newValues = [...values];
+      const digits: string[] = newValue.replace(/\D/g, '').split('').slice(0, 6);
+      const newValues: string[] = [...values];
       
-      digits.forEach((digit, i) => {
+      digits.forEach((digit: string, i: number) => {
         if (index + i < 6) {
           newValues[index + i] = digit;
         }
@@ -26,105 +43,110 @@ export const PinInput: React.FC = () => {
       
       setValues(newValues);
       
-      // Фокус на следующее поле после последней вставленной цифры
-      const nextIndex = Math.min(index + digits.length, 5);
-      inputs.current[nextIndex]?.focus();
+      const nextIndex: number = Math.min(index + digits.length, 5);
+      if (inputs.current[nextIndex]) {
+        inputs.current[nextIndex]?.focus();
+      }
       return;
     }
     
-    // Разрешаем только цифры
     if (newValue && !/^\d+$/.test(newValue)) {
       input.value = values[index];
       return;
     }
 
-    // Обновляем состояние
-    const newValues = [...values];
+    const newValues: string[] = [...values];
     newValues[index] = newValue;
     setValues(newValues);
 
-    // Автоматически переходим к следующему полю если ввели цифру
-    if (newValue && index < 5) {
+    if (newValue && index < 5 && inputs.current[index + 1]) {
       inputs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>, index: number): void => {
+    if (disabled) return;
+    
     const input = e.currentTarget;
     
-    // Обработка Backspace
     if (e.key === 'Backspace') {
       if (input.value) {
-        // Если есть значение - очищаем текущее поле
-        const newValues = [...values];
+        const newValues: string[] = [...values];
         newValues[index] = '';
         setValues(newValues);
-      } else if (index > 0) {
-        // Если поле пустое - переходим к предыдущему
+      } else if (index > 0 && inputs.current[index - 1]) {
         inputs.current[index - 1]?.focus();
-        // И очищаем предыдущее поле
-        const newValues = [...values];
+        const newValues: string[] = [...values];
         newValues[index - 1] = '';
         setValues(newValues);
       }
     }
 
-    // Обработка Delete
     if (e.key === 'Delete' && input.value) {
-      const newValues = [...values];
+      const newValues: string[] = [...values];
       newValues[index] = '';
       setValues(newValues);
     }
 
-    // Навигация стрелками
-    if (e.key === 'ArrowLeft' && index > 0) {
+    if (e.key === 'ArrowLeft' && index > 0 && inputs.current[index - 1]) {
       e.preventDefault();
       inputs.current[index - 1]?.focus();
     }
     
-    if (e.key === 'ArrowRight' && index < 5) {
+    if (e.key === 'ArrowRight' && index < 5 && inputs.current[index + 1]) {
       e.preventDefault();
       inputs.current[index + 1]?.focus();
     }
   };
 
   const handlePaste = (e: ClipboardEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-    const paste = e.clipboardData.getData('text');
-    const digits = paste.replace(/\D/g, '').split('').slice(0, 6);
+    if (disabled) return;
     
-    const newValues = [...values];
-    digits.forEach((digit, i) => {
+    e.preventDefault();
+    const paste: string = e.clipboardData.getData('text');
+    const digits: string[] = paste.replace(/\D/g, '').split('').slice(0, 6);
+    
+    const newValues: string[] = [...values];
+    digits.forEach((digit: string, i: number) => {
       newValues[i] = digit;
     });
     setValues(newValues);
     
-    // Фокус на следующем после вставки поле
-    const nextIndex = Math.min(digits.length, 5);
-    inputs.current[nextIndex]?.focus();
+    const nextIndex: number = Math.min(digits.length, 5);
+    if (inputs.current[nextIndex]) {
+      inputs.current[nextIndex]?.focus();
+    }
   };
 
-  // Функция для установки курсора в конец при фокусе
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    setTimeout(() => {
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>): void => {
+    if (disabled) return;
+    
+    setTimeout((): void => {
       e.target.setSelectionRange(e.target.value.length, e.target.value.length);
     }, 0);
   };
 
+  const setInputRef = (index: number) => (el: HTMLInputElement | null) => {
+    inputs.current[index] = el;
+  };
+
   return (
     <div className="flex gap-x-2 justify-center" onPaste={handlePaste}>
-      {[...Array(6)].map((_, index) => (
+      {[...Array(6)].map((_: undefined, index: number) => (
         <input
           key={index}
-          ref={(el) => inputs.current[index] = el}
+          ref={setInputRef(index)}
           type="text"
           inputMode="numeric"
           maxLength={1}
           value={values[index]}
-          onChange={(e) => handleChange(e, index)}
-          onKeyDown={(e) => handleKeyDown(e, index)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, index)}
+          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index)}
           onFocus={handleFocus}
-          className="w-[45px] rounded-xl h-[60px] bg-[#f4f4f4] text-[28px] font-medium text-center outline-none transition-all duration-200 border-2 border-transparent focus:border-purple-700 focus:bg-white [&:not(:placeholder-shown)]:border-gray-300"
+          disabled={disabled}
+          className={`w-[45px] rounded-xl h-[60px] bg-[#f4f4f4] text-[28px] font-medium text-center outline-none transition-all duration-200 border-2 border-transparent focus:border-purple-700 focus:bg-white [&:not(:placeholder-shown)]:border-gray-300 ${
+            disabled ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
           placeholder=" "
         />
       ))}
