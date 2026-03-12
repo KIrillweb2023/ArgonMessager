@@ -1,11 +1,13 @@
 import React, { type ChangeEvent } from "react";
-import { Check, MailCheck, UserRoundPen } from "lucide-react";
+import { MailCheck, UserRoundPen } from "lucide-react";
 import { AuthLayout } from "../../components/Layouts/Auth/Auth";
 import { FieldAuth } from "../../components/FieldAuth";
 import { AuthStatus } from "../../components/Layouts/Aside/childs/status";
 import { PinInput } from "../../components/PinCode";
 import { useAuth } from "../../hooks/useAuth";
 import { useState } from "react";
+import { CheckboxPolicy } from "../../widgets/checkboxPolicy";
+import { safeAsync } from "../../helpers/safeAsync";
 
 export const AuthPage: React.FC = () => {
   const {
@@ -25,40 +27,24 @@ export const AuthPage: React.FC = () => {
   const [pinCode, setPinCode] = useState<string>('');
   const [isConsentChecked, setIsConsentChecked] = useState<boolean>(false);
 
-  // Обработка отправки email
-  const handleEmailSubmit = async (): Promise<void> => {
+  const handleEmailSubmit = () => {
     if (!emailInput || !isConsentChecked) return;
-    try {
-      await sendEmail(emailInput);
-    } catch {
-      // Ошибка уже обработана в хуке
-    }
+    safeAsync(() => sendEmail(emailInput));
   };
 
-  // Обработка подтверждения кода
-  const handleCodeSubmit = async (): Promise<void> => {
+  const handleCodeSubmit = () => {
     if (pinCode.length !== 6) return;
-    try {
-      await verifyCode(pinCode);
-    } catch {
-      // Ошибка уже обработана в хуке
-    }
+    safeAsync(() => verifyCode(pinCode));
   };
 
-  // Обработка сохранения имени
-  const handleNameSubmit = async (): Promise<void> => {
+  const handleNameSubmit = () => {
     if (!nameInput) return;
-    try {
-      await saveName(nameInput);
-    } catch {
-      // Ошибка уже обработана в хуке
-    }
+    safeAsync(() => saveName(nameInput));
   };
 
   // Переключение чекбокса
-  const toggleConsent = (): void => {
-    setIsConsentChecked(!isConsentChecked);
-  };
+  const toggleConsent = (): void => setIsConsentChecked(!isConsentChecked);
+
 
   return (
     <AuthLayout>
@@ -77,28 +63,12 @@ export const AuthPage: React.FC = () => {
           />
           
           {/* Чекбокс согласия - только на первом шаге */}
-          <div className="flex items-center justify-center gap-x-2 mt-4 w-full">
-            <div 
-              onClick={toggleConsent}
-              className={`w-[22px] h-[22px] rounded-[6px] flex items-center justify-center cursor-pointer transition-colors ${
-                isConsentChecked ? 'bg-[#6421FF]' : 'bg-[#D9D9D9] hover:bg-[#b5b5b5]'
-              }`}
-            >
-              {isConsentChecked && <Check color="#ffffff" size={18} />}
-            </div>
-            <p className="text-sm">
-              I consent to the{" "}
-              <a href="#" className="underline text-[#006FFF] hover:text-[#0055cc]">
-                processing of personal data
-              </a>
-            </p>
-          </div>
-
+         <CheckboxPolicy toggleConsent={ toggleConsent } isConsentChecked={ isConsentChecked }  />
           {error && <p className="text-red-500 mt-2">{error}</p>}
         </div>
       )}
 
-      {/* ШАГ 2: Ввод кода */}
+      {/* 2: Ввод кода */}
       {step === 2 && (
         <div className="flex mt-4 gap-x-4 w-full justify-center flex-col items-center">
           <p className="text-gray-600 mb-2">Код отправлен на {email}</p>
@@ -134,7 +104,7 @@ export const AuthPage: React.FC = () => {
         </div>
       )}
 
-      {/* ШАГ 3: Ввод имени */}
+      {/* 3: Ввод имени */}
       {step === 3 && (
         <div className="flex mt-4 gap-x-4 w-full justify-center flex-col items-center">
           <p className="text-gray-600 mb-2">Email {email} подтвержден!</p>
@@ -151,9 +121,8 @@ export const AuthPage: React.FC = () => {
         </div>
       )}
 
-      {/* Визуальные шаги */}
-      
-        <AuthStatus currentStep={step as 1 | 2 | 3 | 4} />
+      {/* Визуальные шаги */}    
+      <AuthStatus currentStep={step as 1 | 2 | 3 | 4} />
     </AuthLayout>
   );
 };

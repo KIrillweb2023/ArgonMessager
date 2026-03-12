@@ -9,13 +9,28 @@ import { PublicRoute } from "../components/PublicRoute"
 export const App = () => {
     return (
         <Routes>
-            <Route element={ <PublicRoute> <AuthPage/> </PublicRoute> } path="/authenfication" />
+            <Route element={ 
+                <PublicRoute> 
+                    <AuthPage/> 
+                </PublicRoute> 
+            } path="/authenfication" />
 
 
-            <Route element={ <ProtectedRoute> <MainPage/> </ProtectedRoute>} path="/" />
-            <Route element={ <ProtectedRoute> <MainPage/> </ProtectedRoute>} path="/chat" />
+            <Route element={ 
+                <ProtectedRoute> 
+                    <MainPage/> 
+                </ProtectedRoute>
+            } path="/" />
 
-             <Route path="*" element={<Navigate to="/" replace />} />
+            <Route element={ 
+                <ProtectedRoute> 
+                    <MainPage/> 
+                </ProtectedRoute>
+            } path="/chat" />
+
+            <Route path="*" element={
+                <Navigate to="/" replace />
+            } />
         </Routes>
     )
 }

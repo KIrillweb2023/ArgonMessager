@@ -2,6 +2,7 @@ import { FileBracesCorner, LayoutDashboard, Mic, PhoneForwarded, Search } from "
 import LogoAvatarGroup from "@assets/components-logo/avatar-argon.png";
 import Avatar from "@assets/components-avatar/test3.png";
 import SendMessage from "@assets/send-message.png";
+import { Message } from "./childs/Message";
 
 export const Chat = () => {
     return (
@@ -24,24 +25,13 @@ export const Chat = () => {
             </div>
 
             <div className="w-full h-screen flex flex-col justify-end px-4 pb-[90px] gap-y-6">
-
-                <div className="w-full">
-                    <div className="flex gap-x-4 w-auto">
-                        <div className="w-[45px]">
-                            <img src={Avatar} alt="" />
-                        </div>
-                        <div className="w-auto">
-                            <div className="flex items-center w-full justify-between">
-                                <h4 className="text-[14px]">0new1n Counter</h4>
-                                <p className="text-[14px]">11.22</p>
-                            </div>
-                            <div className="bg-white px-4 py-2 rounded-[0px_30px_30px_10px] mt-[5px]">
-                                <p className="text-[18px] text-[#4d4d4d] font-semibold">Lorem Ipsum has been the industry's standard dummy</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-             
+                <Message 
+                    urlAvatar={Avatar} 
+                    altAvatar={"Аватарка пользователя"} 
+                    nameUser={"Kirill Guliaev"} 
+                    timeMessage={"10:31"} 
+                    textMessage={"Играй в требовательные игры на слабом ПК через МТС Fog Play. Плати только за время! · 60 FPS."}  
+                />             
             </div>
 
             <div className="z-2 px-4 w-[97%] h-auto flex items-center justify-between absolute bottom-[10px] left-[50%] transform -translate-x-[50%]  bg-white/20 backdrop-blur-xs backdrop-brightness-110 rounded-2xl border border-white/30 shadow-lg">

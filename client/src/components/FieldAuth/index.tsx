@@ -9,7 +9,7 @@ interface FieldProps {
     onSubmit?: () => void;
     loading?: boolean;
     type?: string;
-    disabled?: boolean; // Добавляем disabled
+    disabled?: boolean; 
 }
 
 export const FieldAuth: React.FC<FieldProps> = ({ 
@@ -21,7 +21,7 @@ export const FieldAuth: React.FC<FieldProps> = ({
     onSubmit,
     loading = false,
     type = "text",
-    disabled = false // Добавляем disabled со значением по умолчанию
+    disabled = false 
 }) => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && onSubmit && !loading && !disabled) {

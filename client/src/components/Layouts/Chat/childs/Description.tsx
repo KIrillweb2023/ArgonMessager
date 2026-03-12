@@ -2,10 +2,13 @@ import { BadgeX, BellDot, ChevronsRight, CircleArrowRight, Copy, Image, Info, Pl
 import LogoAvatarGroup from "@assets/components-logo/avatar-argon.png";
 import Test1 from "@assets/components-info/test-one.png";
 import Test2 from "@assets/components-info/test-2.png";
+import { Divider } from "../../../../widgets/divider";
 
 export const Description = () => {
     return (
         <div className="w-[20%] py-6 px-6 overflow-y-auto h-screen">
+
+            {/* Комм. шапки описания */}
             <div className="flex justify-between w-full">
                 <div className="flex gap-x-4 items-center">
                     <Info color="#6421FF"/>
@@ -16,9 +19,10 @@ export const Description = () => {
                 </div>
             </div>
 
-            <span className="w-full h-px bg-stone-200 rounded-px block mt-6"></span>
+            <Divider/>
 
 
+            {/* комп. основная инфа */}
             <div className="flex flex-col items-center py-8">
                 <img className="w-[80px]" src={LogoAvatarGroup} alt="" />
                 <h3 className="text-xl mt-[10px]">Argon Team</h3>
@@ -26,10 +30,12 @@ export const Description = () => {
             </div>
 
 
+            {/* комп. текст о чате или группе */}
             <h4 className="font-bold text-lg">Description</h4>
             <p className="text-[14px] text-stone-500 mt-2">Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio, cumque nihil impedit, quo minus id, quod maxime...</p>
 
 
+            {/* комп. либо виджет ссылки на группу или человека */}
             <div className="mt-6 flex justify-between">
                 <p className="text-[#6421FF] font-semibold">@Argon Team</p>
                 <div>
@@ -37,8 +43,11 @@ export const Description = () => {
                 </div>
             </div>
 
-            <span className="w-full h-px bg-stone-200 rounded-px block mt-6"></span>
+            <Divider/>
 
+
+
+            {/* комп. настойки группы или человека */}
             <div className="mt-6 flex justify-between items-center">
                 <div className="flex gap-x-4">
                     <BellDot color="#6421FF" />
@@ -50,7 +59,8 @@ export const Description = () => {
                 </div>
             </div>
 
-              <span className="w-full h-px bg-stone-200 rounded-px block mt-6"></span>
+            <Divider/>
+            {/* комп. медиа блока в группе */}
 
             <div className="mt-6 flex justify-between items-center">
                 <div className="flex gap-x-4">
@@ -61,6 +71,7 @@ export const Description = () => {
                 <p className="text-[13px] text-[#6421FF] font-bold">(3324 items)</p>
             </div>
 
+            {/* комп. табы файлов, медиа, и ссылок в чате */}
             <ul className="flex w-full justify-between bg-[#EEEEEE] rounded-3xl py-[8px]  px-4 mt-6">
                 <li className="font-semibold py-[5px] px-3 text-white bg-[#6421FF] h-full rounded-3xl">Photos</li>
                 <li className="font-semibold py-[5px] px-3 text-[#7D7D7D] h-full rounded-3xl">Video</li>
@@ -68,7 +79,7 @@ export const Description = () => {
                 <li className="font-semibold py-[5px] px-3 text-[#7D7D7D] h-full rounded-3xl">Link</li>
             </ul>
 
-
+            {/* комп. один из элементов в табах данный случай картинки */}
             <div className="flex gap-x-2 mt-4 h-auto">
                 <div className="w-[130px] h-[130px]">
                     <img className="w-full h-full" src={Test1} alt="" />
@@ -82,6 +93,7 @@ export const Description = () => {
             </div>
 
 
+            {/*  комп. шапки численности группы плюс тут добавление  */}
             <div className="mt-6 flex justify-between items-center">
                 <div className="flex gap-x-4">
                     <Users color="#969696" />
@@ -94,7 +106,7 @@ export const Description = () => {
             </div>
 
 
-
+            {/* сами люди присутствующие в группе */}
             <div className="flex flex-col mt-6 gap-y-4">
                 <div className="w-full flex items-center relative gap-x-4">
                     <img src={LogoAvatarGroup} alt="" className="w-[40px]" />
@@ -127,8 +139,10 @@ export const Description = () => {
             </div>
 
 
-            <span className="w-full h-px bg-stone-200 rounded-px block mt-6"></span>
+            <Divider/>
 
+
+            {/* кнопка удаления группы или чата(только для админов) */}
             <div className="flex gap-x-4 justify-center items-center mt-6 cursor-pointer">
                 <BadgeX color="#FF3030"/>
                 <p className="text-[18px] text-[#FF3030] font-semibold ">Delete and leave</p>
